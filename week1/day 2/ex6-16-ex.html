@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>switch문</title>
+</head>
+<body>
+    <h3>swtich문으로 커피주문</h3>
+    <hr>
+    <script>
+        let price = 0, sum = 0;
+        let cnt = prompt("몇 잔을 주문하시겠습니까?");
+        cnt = parseInt(cnt);
+        // 주문 수량 만큼 주문을 받아 전체 커피 금액과 커피 내용을 출력하세요
+        // while, switch 문 활용
+        while(cnt > 0) { 
+            let coffee = prompt("무슨 커피 드릴까요?" + cnt + "잔 남음");
+            switch(coffee) {
+                case "에스프레소" : price = 2000; sum += price;
+                cnt -= 1;
+                document.write(coffee + "는 " + price + "원 입니다.<br>");
+            break;
+            case "아이스아메리카노" : 
+            case "아아"  : price = 3000; sum += price;
+                cnt -= 1;
+                document.write(coffee + "는 " + price + "원 입니다.<br>");
+            break;
+            case "카페라떼" : price = 4000; sum += price;
+                cnt -= 1;
+                document.write(coffee + "는 " + price + "원 입니다.<br>");
+            break;
+            default:
+             alert(coffee + "는 없는 메뉴 입니다.");
+            }
+        } document.write("전체 금액은 " + sum + "원 입니다.");
+    </script>
+</body>
+</html>

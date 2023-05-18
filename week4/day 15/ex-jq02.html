@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.js"></script>
+    <title>Document</title>
+    <script>
+        $(document).ready(function() {
+            $('#show_it').click(function() {
+                // $('#dog_img').show('slow'); // 보이기 옆에 'slow'는 천천히 보이기 'fast'는 빠르게 보이기
+                // $('#dog_img').toggle('slow'); // 버튼 눌러서 보이기/안보이기
+                // $('#dog_img').animate({ left: '100px'});
+
+                // 메소드 체이닝 - 함수가 끝나고 다른 함수 호출
+                $('#dog_img').toggle('slow').animate({ left: '100px'}) // 위 두줄과 같음
+            })
+
+            $("#fade_in").click(function() {
+                $('#dog_img').fadeIn('slow');
+            })
+            $("#fade_out").click(function() {
+                $('#dog_img').fadeOut('slow');
+            })
+        })
+    </script>
+</head>
+<body>
+    <button id="show_it">show it</button>
+    <button id="fade_in">fade in</button>
+    <button id="fade_out">fade out</button>
+    <img id= 'dog_img' src= "../media/dog.png" width="120px" height="100px" style="display: none; position: relative;" alt="">
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="css/nameList.css">
+    <script>
+        function fn_register() {
+            let p = document.createElement("p"); // element로 p태그 만들기
+            let input = document.getElementById("userName")
+            let div = document.getElementById("nameList")
+            let btn = document.createElement("span");
+
+            btn.setAttribute('class','del'); // CSS를 클래스로입히기
+            btn.innerHTML = "X";
+            btn.onclick = function() {
+                p.remove(this);
+            }
+            
+            // console.log(btn);
+            p.innerHTML = input.value; 
+            p.appendChild(btn); // btn 객체를 다 다듬고 append 해주어야함
+            // p.innerHTML += input.value; // 만약 append로 먼저 추가했다면 +=
+            input.value = "";
+            
+            div.appendChild(p); // 똑같이. 객체를 다 다듬고 append 해주어야함
+        }
+        
+        function fn_enter(e) {
+            if(e.keyCode == 13) {
+                fn_register();
+            }
+        }
+    </script>
+</head>
+<body>
+    <div id="container">
+        <h1>참가 신청서</h1>
+        <form action="" onsubmit="return false">
+            <input type="text" id="userName" placeholder="이름을 입력하세요" autocomplete="off" required onkeyup="fn_enter(event)">
+            <button type="button" onclick="fn_register()">신청</button>
+        </form>
+        <hr>
+        <div id="nameList"></div>
+    </div>
+</body>
+
+</html>

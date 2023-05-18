@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>grid 그리기</title>
+    <style>
+        body { background-color: aquamarine; margin: 0; left: 0;}
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="420px" height="420px" style="background-color: white; margin: 20px;"></canvas>
+    <button onclick="fn_draw()">그리기</button>
+    <script>
+        let w = 400;
+        let h = 400;
+        let p = 10;
+        let canvas = document.getElementById('myCanvas');
+        let context = canvas.getContext('2d');
+        let arr = [];
+        function fn_draw() {
+            for(let i = 0; i <= w; i+= 40) {
+                let x = p + 0.5 + i;
+                context.moveTo(x, p);
+                context.lineTo(x, h + p);
+                arr.push(p + 0.5 + i);
+            }
+            for(let i = 0; i <= w; i+= 40) {
+                let y = p + 0.5 + i;
+                context.moveTo(p, y);
+                context.lineTo(h + p, y);
+            }
+                context.strokeStyle = 'black';
+                context.stroke();
+
+        let idx = Math.floor(Math.random() * 10);
+        let mine = arr[idx];
+        console.log(mine);
+        
+        canvas.addEventListener('click', function(e) {
+            let eX = 0;
+            let eY = 0;
+            for(let i = 0; i < arr.length; i++) {
+                if(arr[i] <= e.offsetX && e.offsetX < arr[i+1]) {
+                    eX = arr[i];
+                }
+                if(arr[i] <= e.offsetY && e.offsetY < arr[i+1]) {
+                    eY = arr[i];
+                }
+
+            }
+            let color = 'brown';
+            if(mine == eX && mine == eY) {
+                color = 'red';
+                alert("지뢰걸림");
+            }
+            if(eX != 0 && eY != 0) {
+                context.beginPath();
+                context.fillStyle = color;
+                context.rect(eX, eY, 40, 40);
+                context.fill();
+            }
+
+        });
+    }
+    </script>
+</body>
+</html>
