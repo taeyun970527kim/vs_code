@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>지역 종량제 봉투 가격</title>
+    <script>
+        $(document).ready(function () {
+            let sido = [];
+            $.ajax({
+                url: 'price.json'
+                , type: 'get'
+                , dataType: 'json'
+                , success: function (res) {
+                    console.log(res);
+                    // (1)  시도 중복제거 (key로) 사용
+                    records = res['records'];
+                    $.each(records, function (i, v) {
+                        sido.push(v['시도명']); // property 값 ... 시도명에 해당하는 value 
+                    });
+                    sido.sort();
+                    $.unique(sido); // 정렬 후 unique로 중복 제거
+                    console.log(sido);
+                    
+                    // es6 이후
+                    // array.from(set)
+                    // let set = new Set();
+                    // $.each(records, function (i, v) {
+                    //     set.add(v['시도명']); // value가 시도명인 애들
+                    // });
+                    // let sido2 = Array.from(set); // array 형태로 형변환
+                    // console.log(sido2);
+                    
+                    // (2) 해당 시도에 해당 조건의 ( 생활쓰레기, 가정용, 10L가격)을 list형식으로
+                    // 시도별 생활쓰레기, 가정용, 10L 가격(시도별 평균으로)
+                    // ["대전광역시" : ['금액, '금액', '금액']]
+                    let p_data = {}; // 객체선언
+                    $.each(sido, function(i, v) { // 배열이면 i = index , v = value // 객체면 i = key, v = value
+                        let temp_cost = []; // 배열 each문 안에 쓰는 이유는 돌때마다 초기화시킴
+                        $.each(records, function(idx, val) {
+                            if(val['시도명'] == v && val['종량제봉투용도'] == '생활쓰레기' && val['종량제봉투사용대상'] == '가정용' && val['10ℓ가격'] != '0') {
+                                // if(val['10ℓ가격'] != '0') {
+                                    temp_cost.push(val['10ℓ가격']);
+                                // }
+                            }
+                        });
+                        p_data[v] = temp_cost; // p_data의 key값에 금액을 할당
+                        // 
+                        console.log("===========================================================");
+                        console.log(p_data[v]); // 금액
+                        console.log("===========================================================");
+                    });
+                    console.log(p_data); // 이 금액에 해당하는 밸류들을 다 소환?
+                    let data = [];
+                    let colors = [];
+                    $(sido).each(function(i, v) {
+                        data.push(fn_avg(p_data[v])); // 평균 구해서 push
+                        colors.push(fn_random_color()); // 랜덤 컬러 같이 push
+                    });
+                    console.log(data);
+
+                    // 그래프 넣기
+                    const ctx = document.getElementById('myChart');
+                    let config = {
+                        type: 'bar',
+                        data: {
+                            labels: sido, // 도시별
+                            datasets: [{
+                            label: '시도별 10ℓ 종량제 봉투 가격 평균',
+                            data: data,
+                            borderWidth: 1,
+                            backgroundColor: colors
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            },
+                            plugins : {
+                                title: {
+                                    display : true,
+                                    text : '시도별 10ℓ 종량제 봉투 가격 평균'
+                                },
+                                legend: {
+                                    display: false
+                                }
+                            }
+                        }
+                        }
+                        let myChart = new Chart(ctx, config);
+                }
+            });
+            // 평균 구하기
+            function fn_avg(arr) {
+                let sum = 0;
+                $(arr).each(function(i, v) {
+                    sum += parseFloat(v); // 문자열을 숫자로 형변환
+                });
+                return Math.round(sum / arr.length);
+            }
+            // 랜덤 컬러 함수
+            function fn_random_color() {
+                let R = Math.floor(Math.random() * (255+1));
+                let G = Math.floor(Math.random() * (255+1));
+                let B = Math.floor(Math.random() * (255+1));
+                let str = 'rgba(' + R + ',' + G + ',' + B + ', 0.3)';
+                return str;
+            }
+        });
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <canvas id="myChart"></canvas>
+    </div>
+</body>
+
+</html>
