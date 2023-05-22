@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.4.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="base.js"></script>
+    <title>Document</title>
+    <script>
+        // 마우스 휠 이벤트에 따라
+        // 0 : 1년, 1 : 3개월, 2 : 1개월, 3: 1주일
+        // 현재 일자를 기준으로 1년
+        let today = new Date();
+
+        // 현재 일자를 기준으로 1년 구하기
+        let temp_st = new Date(today.getTime() - (365 * 24 * 60 * 60 * 1000));
+        // YYYY-MM-DD 스타일의 국제표준에서 문자열을 자르기위해 (한국 +9 시간을 해줌)
+        let temp_end = new Date(today.getTime() + (9 * 60 * 60 * 1000));
+        
+        let st_dt = temp_st.toISOString().slice(0,10);
+        let end_dt = temp_end.toISOString().slice(0,10);
+
+        console.log(st_dt, end_dt);
+        let dataset = {};
+        let main_url = "https://api.exchangerate.host/timeseries";
+            $.ajax({
+                url : main_url
+                ,type : 'get'
+                ,data : {'start_date' : st_dt
+                        ,'end_date' : end_dt}
+                ,dataType : 'json'
+                ,success : function(res) {
+                    dataset = fn_exchange_dataset(res);
+                    console.log(dataset)
+                    init();
+                }
+            });
+        let view_labels = [];
+        let view_data = [];
+        let state = 0; // 스크롤
+        let ctx;
+        let myChart;
+        function init() {
+            view_labels = dataset['KRW']['labels'];
+            view_data = dataset['KRW']['data'];
+            myChart = new Chart(ctx, {
+                 type : 'line'
+                ,data : {
+                     labels : view_labels
+                    ,datasets : [{
+                         label : dataset['KRW']['label']
+                        ,data : view_data
+                    }]
+                }
+                ,options : {
+                     elements : { line : { tension: 0.1}}
+                    ,plugins : { title : {
+                                          display : true
+                                         ,text : '1년 환율'
+                                         },
+                                         legend : {
+                                            display : false
+                                                  }
+                                }
+                }
+            });
+        }
+        $(document).ready(function() {
+            ctx = $('#myChart');
+            $(ctx).on('wheel', function(e) {
+                // console.log(e); // jQuery 이벤트
+                // console.log(e.originalEvent);
+                // console.log(e.originalEvent.wheelDelta);
+                if(e.originalEvent.wheelDelta > 0) {
+                    if(state >= 3) {
+                        // 3보다 안 커지게
+                        state = 3;
+                    } else {
+                        state ++
+                    }
+                } else {
+                    if(state <= 0) {
+                        // 0보다 안 작아지게
+                        state = 0;
+                    } else {
+                        state--;
+                    }
+                }
+                fn_update(state);
+            });
+        });
+        function fn_update(p_state) {
+            let v_labels = [];
+            let v_data = [];
+            let title = "";
+            if(p_state == 0) {
+                // 1년
+                v_labels = view_labels;
+                v_data = view_data;
+                title = '1년 환율';
+            } else if(p_state == 1) {
+                // 3개월
+                for(let i = view_labels.length - 90; i <  view_labels.length; i++) {
+                    v_labels.push(view_labels[i]);
+                    v_data.push(view_data[i]);
+                }
+                title = '3개월';
+            } else if(p_state == 2) {
+                // 1개월
+                for(let i = view_labels.length - 30; i <  view_labels.length; i++) {
+                    v_labels.push(view_labels[i]);
+                    v_data.push(view_data[i]);
+                }
+                title = '1개월';
+            } else if(p_state == 3) {
+                // 1주일
+                for(let i = view_labels.length - 7; i <  view_labels.length; i++) {
+                    v_labels.push(view_labels[i]);
+                    v_data.push(view_data[i]);
+                }
+                title = '7일';
+            }
+            myChart.data.labels = v_labels;
+            myChart.data.datasets[0].data = v_data;
+            myChart.options.plugins.title.text = title;
+            myChart.update();
+        }
+    </script>
+</head>
+<body>
+    <h3>환율</h3>
+    <div style="width: 800px; height: 600px;">
+        <canvas id="myChart" width="800px" height="500px"></canvas>
+    </div>
+</body>
+</html>
