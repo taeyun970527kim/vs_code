@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script>
+        let nm;
+        function error_test() {
+            setTimeout(() => {
+                nm = 'nick'
+            }, 1000);
+            return nm;
+            // 기다려주지 않아서 undefined
+            // 기다려주게끔 하는게 아래(await)와 차이나는 부분
+        }
+        let name = error_test();
+        console.log(name);
+
+        async function test() {
+            msg = await new Promise((resolve, reject) => {
+                // await를 쓰기위해 promise를 생성
+                setTimeout(() => {
+                    console.log('hello');
+                    resolve({
+                        message : "promis가 성공적임.."
+                        , data : [1, 2, 3]
+                    });
+                }, 1000);
+            });
+            return msg;
+        }
+        let result = test();
+        console.log(result.then((data) => {console.log(data)}));
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
